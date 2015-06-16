@@ -72,6 +72,8 @@ def check_memcached(item, params, info):
 def ratio(current,maximum):
     current = int(current)
     maximum = int(maximum)
+    if maximum == 0:
+        return 0
     return current*100/maximum
 
 check_info['memcached.size'] = \
