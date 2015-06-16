@@ -46,7 +46,7 @@ def check_memcached(item, params, info):
     # currently only supported for localhost
     localhost = data["127.0.0.1:11211"]
 
-    if(item == "memcached.hits"):
+    if(item == "memcached.size"):
         r = ratio(localhost["bytes"],localhost["limit_maxbytes"])
 
         if r > crit:
@@ -56,15 +56,15 @@ def check_memcached(item, params, info):
         else:
             return(0, "OK - Current memory usage: %d%%" % r)
 
-    if(item == "memcached.size"):
+    if(item == "memcached.hits"):
         h = ratio(localhost["get_hits"],localhost["cmd_get"])
 
-        if h > crit:
-            return(2, "Critical - Current memory usage: %d%%" % h)
-        elif h > warn:
-            return(1, "Warning - Current memory usage: %d%%" % h) 
+        if h < crit:
+            return(2, "Critical - Current cache hit rate: %d%%" % h)
+        elif h < warn:
+            return(1, "Warning - Current cache hit rate: %d%%" % h) 
         else:
-            return(0, "OK - Current memory usage: %d%%" % h)
+            return(0, "OK - Current cache hit rate: %d%%" % h)
 
 
     return (3, "Undefined check item (%s), please check the memcached plugin source code. :-)" % item)
@@ -72,6 +72,8 @@ def check_memcached(item, params, info):
 def ratio(current,maximum):
     current = int(current)
     maximum = int(maximum)
+    if (maximum == 0):
+        return 100
     return current*100/maximum
 
 check_info['memcached.size'] = \
